@@ -1,9 +1,20 @@
 #!python
 print("content-type:text/html; charset=UTF-8\n")
 print()
-import cgi
+import cgi, os
+files = os.listdir('data')
+
 form = cgi.FieldStorage()
-pageId = form["id"].value
+if 'id' in form:
+    pageId = form.getvalue('id')
+    description = open('./data/' + pageId,'r').read()
+else:
+    pageId = 'Welcome'
+    description = 'Hello, Web'
+
+listStr = ''
+for item in files:
+    listStr += '<li><a href="index.py?id={name}">{name}</a></li>'.format(name=item)
 print('''
 <!DOCTYPE html>
 <html>
@@ -12,14 +23,12 @@ print('''
     <title>Document</title>
 </head>
 <body>
-    <h1><a href="index.py?id=WEB">Web</a></h1>
+    <h1><a href="index.py">Web</a></h1>
     <ol>
-        <li><a href ="index.py?id=HTML">HTML</a></li>
-        <li><a href ="index.py?id=CSS">CSS</a></li>
-        <li><a href ="index.py?id=Javascript">Javascript</a></li>
+        {filelist}
     </ol>
     <h2>{title}</h2>
-    Web...
+    {description}
 </body>
 </html>
-'''.format(title=pageId))
+'''.format(title=pageId, description=description, filelist=listStr))
