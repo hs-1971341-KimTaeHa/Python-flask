@@ -1,8 +1,7 @@
 #!python
 print("content-type:text/html; charset=UTF-8\n")
 print()
-import cgi, os
-files = os.listdir('data')
+import cgi, os, view
 
 form = cgi.FieldStorage()
 if 'id' in form:
@@ -12,9 +11,6 @@ else:
     pageId = 'Welcome'
     description = 'Hello, Web'
 
-listStr = ''
-for item in files:
-    listStr += '<li><a href="index.py?id={name}">{name}</a></li>'.format(name=item)
 print('''
 <!DOCTYPE html>
 <html>
@@ -37,4 +33,4 @@ print('''
     </form>
 </body>
 </html>
-'''.format(title=pageId, description=description, filelist=listStr, form_default_title=pageId, form_default_description=description))
+'''.format(title=pageId, description=description, filelist=view.getList(), form_default_title=pageId, form_default_description=description))
