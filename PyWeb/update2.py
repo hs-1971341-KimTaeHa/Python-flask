@@ -1,0 +1,36 @@
+#!python
+print("content-type:text/html; charset=UTF-8\n")
+print()
+import cgi, os, view
+
+form = cgi.FieldStorage()
+if 'id' in form:
+    pageId = form.getvalue('id')
+    description = open('./data/' + pageId,'r').read()
+else:
+    pageId = 'Welcome'
+    description = 'Hello, Web'
+
+print('''
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <h1><a href="index.py">Web</a></h1>
+    <ol>
+        {filelist}
+    </ol>
+    <a href="create.py">create</a>
+    <a href="update.py">update</a>
+    <form action="update2.py" method="post">
+        <input type="hidden" name="pageId" value="{form_default_title}">
+        <p><input type="text" name="title" value="{form_default_title}"></p>
+        <p><textarea name="description">{form_default_description}</textarea></p>
+        <input type="submit" value="submit"></input>
+    </form>
+</body>
+</html>
+'''.format(title=pageId, description=description, filelist=view.getList(), form_default_title=pageId, form_default_description=description))
