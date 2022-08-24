@@ -11,8 +11,8 @@ def index():
 def Welcome():
     return 'Welcome'
 
-@app.route('/read/1/')
-def read():
-    return 'read 1'
+@app.route('/read/<id>/')
+def read(id):
+    return 'read'+id
 
 app.run(debug=True)
