@@ -1,6 +1,7 @@
-from flask import Flask
-import random
+from flask import Flask, request, redirect
 app = Flask(__name__)
+
+nextId = 4
 
 topics = [
     {'id':1, 'title':'HTML', 'body':'HTML is ...'},
@@ -21,6 +22,7 @@ def template(contents, content):
                     <ol>
                         {contents}
                     </ol>
+                    <a href="/create/">create</a>
                     {content}
                 </body>
             </html>
@@ -47,9 +49,26 @@ def read(id):
             body = topic['body']
     return template(getContens(), f'<h2>{title}</h2>{body}')
 
-@app.route('/create/')
+@app.route('/create/', methods=['GET','POST'])
 def create():
-    return 'create'
+    if request.method == 'GET':
+        content = '''
+            <form action="/create/" method="POST">
+                <p><input type="text" name="title" placeholder="title"></p>
+                <p><textarea name="description" placeholder="description"></textarea></p>
+                <input type="submit" value="create"/>
+            </form>
+        '''
+        return template(getContens(), content)
 
+    elif request.method == 'POST':
+        global nextId
+        title = request.form['title']
+        description = request.form['description']
+        newTopic = {'id':nextId, 'title':title, 'body':description}
+        topics.append(newTopic)
+        url = '/read/'+str(nextId)+'/'
+        nextId += 1
+        return redirect(url)
 
 app.run(debug=True)
