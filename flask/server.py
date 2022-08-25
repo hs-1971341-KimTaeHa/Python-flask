@@ -1,3 +1,4 @@
+from turtle import title
 from flask import Flask, request, redirect
 app = Flask(__name__)
 
@@ -9,7 +10,15 @@ topics = [
     {'id':3, 'title':'Javascript', 'body':'JS is ...'}
 ]
 
-def template(contents, content):
+def template(contents, content, id=None):
+    contextUI =''
+    if id != None:
+        contextUI = f'''
+            <a href="/update/{id}">update</a>
+            <form action="/delete_process/{id}/" method="POST">
+                <input type="submit" value="delete"/>
+            </form>
+        '''
     return f'''
             <!doctype html>
             <html>
@@ -23,6 +32,7 @@ def template(contents, content):
                         {contents}
                     </ol>
                     <a href="/create/">create</a>
+                    {contextUI}
                     {content}
                 </body>
             </html>
@@ -47,7 +57,7 @@ def read(id):
         if id == topic['id']:
             title = topic['title']
             body = topic['body']
-    return template(getContens(), f'<h2>{title}</h2>{body}')
+    return template(getContens(), f'<h2>{title}</h2>{body}', id)
 
 @app.route('/create/', methods=['GET','POST'])
 def create():
@@ -70,5 +80,35 @@ def create():
         url = '/read/'+str(nextId)+'/'
         nextId += 1
         return redirect(url)
+
+@app.route('/update/<int:id>/', methods=['GET','POST'])
+def update(id):
+    if request.method == 'GET':
+        title=''
+        body=''
+        for topic in topics:
+            if id == topic['id']:
+                title = topic['title']
+                body = topic['body']
+                break
+        content = f'''
+                <form action="/update/{id}/" method="POST">
+                    <p><input type="text" name="title" value="{title}"/></p>
+                    <p><textarea name="description">{body}</textarea></p>
+                    <input type="submit" value="update"/>
+                </form>
+            '''
+        return template(getContens(), content, id)
+    elif request.method == 'POST':
+        for topic in topics:
+            if id == topic['id']:
+                topic['title'] = request.form['title']
+                topic['body']= request.form['description']
+                break
+        url = '/read/'+str(id)+'/'
+        return redirect(url)
+    
+
+
 
 app.run(debug=True)
